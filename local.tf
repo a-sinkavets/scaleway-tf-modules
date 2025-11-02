@@ -8,7 +8,7 @@ locals {
   # instance additional volume
   attach_additional_volume     = true
   additional_volume_size_in_gb = 1
-  additional_volume_iops       = 3000
+  additional_volume_iops       = 5000 # available values: [5000, 15000]
 
   # instance security groups
   instance_allowed_ports = [22, 80, 443]
