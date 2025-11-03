@@ -1,0 +1,59 @@
+name: Run Terraform Instance
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose action to perform'
+        required: true
+        default: 'apply'
+        options:
+          - apply
+          - destroy
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    environment: scaleway-modules
+    env:
+      SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
+      SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
+      SCW_ORGANIZATION_ID: ${{ secrets.SCW_ORGANIZATION_ID }}
+      SCW_DEFAULT_PROJECT_ID: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+      STATE_BUCKET:   ${{ secrets.STATE_BUCKET }}
+      STATE_KEY:      ${{ secrets.STATE_KEY }}
+      SCW_DEFAULT_ZONE: ${{ secrets.SCW_DEFAULT_ZONE }}
+      SCW_DEFAULT_REGION: ${{ secrets.SCW_DEFAULT_REGION }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Populate Environment Variables
+        run: |
+          cat > backend.hcl <<'EOF'
+          bucket                      = "${STATE_BUCKET}"
+          key                         = "${STATE_KEY}"
+          region                      = "${SCW_DEFAULT_REGION}"
+          endpoint                    = "https://s3.${SCW_DEFAULT_REGION}.scw.cloud"
+          access_key                  = "${SCW_ACCESS_KEY}"
+          secret_key                  = "${SCW_SECRET_KEY}"
+          skip_credentials_validation = true
+          force_path_style            = true
+          skip_region_validation      = true
+          skip_requesting_account_id  = true
+          EOF
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: terraform apply -auto-approve
+
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        run: terraform destroy -auto-approve

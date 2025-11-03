@@ -12,3 +12,8 @@ variable "inbound_rules" {
     ip_range = string
   }))
 }
+
+variable "common_tags" {
+  description = "Common tags to apply to the instance."
+  type        = map(string)
+}

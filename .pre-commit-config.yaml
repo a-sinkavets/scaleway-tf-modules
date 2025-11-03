@@ -29,7 +29,12 @@ repos:
   rev: v1.103.0
   hooks:
     - id: terraform_docs
+      args:
+        - --args=--recursive
+        - --args=--recursive-path=.
     - id: terraform_fmt
+      args:
+        - --args=-diff
     - id: terraform_validate
     - id: terraform_tflint
     - id: terraform_trivy

@@ -13,3 +13,8 @@ variable "iops" {
   description = "The IOPS configuration for the block volume."
   type        = number
 }
+
+variable "common_tags" {
+  description = "Common tags to apply to the instance."
+  type        = map(string)
+}

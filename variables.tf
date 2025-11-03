@@ -24,8 +24,7 @@ variable "project_id" {
 
 variable "sc_zone" {
   type        = string
-  default     = "pl-waw-2"
-  description = "ScaleWay zone that will be used as default value for all resources ()SCW_DEFAULT_ZONE"
+  description = "ScaleWay zone that will be used as default value for all resources (SCW_DEFAULT_ZONE)"
 
   validation {
     condition     = contains(["fr-par-1", "fr-par-2", "fr-par-3", "nl-ams-1", "nl-ams-2", "nl-ams-3", "pl-waw-1", "pl-waw-2", "pl-waw-3"], var.sc_zone)
@@ -35,11 +34,32 @@ variable "sc_zone" {
 
 variable "sc_region" {
   type        = string
-  default     = "pl-waw"
   description = "ScaleWay region that will be used as default value for all resources (SCW_DEFAULT_REGION)"
 
   validation {
     condition     = contains(["fr-par", "nl-ams", "pl-waw"], var.sc_region)
     error_message = "Valid values for var: sc_region are ('fr-par', 'nl-ams', 'pl-waw')."
   }
+}
+
+variable "common_tags" {
+  description = "Common tags to apply to the resources."
+  type        = map(string)
+  default = {
+    Terraform   = "true"
+    Environment = "staging"
+    Project     = "web-app"
+  }
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "state_bucket" {
+  description = "The S3 bucket name for Terraform state storage."
+  type        = string
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "state_key" {
+  description = "The S3 key (path) for the Terraform state file."
+  type        = string
 }

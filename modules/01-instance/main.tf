@@ -8,8 +8,8 @@ resource "scaleway_instance_server" "web" {
     size_in_gb = var.root_volume_size_in_gb
   }
 
-  ip_id                 = var.public_ip_id != null ? var.public_ip_id : ""
-  additional_volume_ids = [var.additional_volume_id != null ? var.additional_volume_id : ""]
+  ip_id                 = var.public_ip_id != null ? var.public_ip_id : null
+  additional_volume_ids = var.additional_volume_id != null ? [var.additional_volume_id] : []
 
-  tags = ["role=${var.instance_role}", "env=${var.instance_env}"]
+  tags = var.common_tags != null ? [for k, v in var.common_tags : "${k}=${v}"] : []
 }

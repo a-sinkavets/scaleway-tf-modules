@@ -39,12 +39,7 @@ variable "instance_image" {
   default     = "ubuntu_jammy"
 }
 
-variable "instance_role" {
-  description = "Role tag for the instance."
-  type        = string
-}
-
-variable "instance_env" {
-  description = "Environment tag for the instance."
-  type        = string
+variable "common_tags" {
+  description = "Common tags to apply to the instance."
+  type        = map(string)
 }

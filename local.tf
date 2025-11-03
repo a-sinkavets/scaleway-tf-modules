@@ -19,8 +19,4 @@ locals {
       ip_range = "0.0.0.0/0"
     }
   ]
-
-  # instance tags
-  instance_role = "frontend"
-  instance_env  = "staging"
 }

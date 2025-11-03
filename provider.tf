@@ -6,6 +6,8 @@ terraform {
       version = "2.60.5"
     }
   }
+  backend "s3" {
+  }
 }
 
 provider "scaleway" {

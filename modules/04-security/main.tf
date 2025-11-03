@@ -11,4 +11,6 @@ resource "scaleway_instance_security_group" "security_group" {
       ip_range = inbound_rule.value.ip_range != null ? inbound_rule.value.ip_range : ""
     }
   }
+
+  tags = var.common_tags != null ? [for k, v in var.common_tags : "${k}=${v}"] : []
 }
