@@ -31,12 +31,12 @@ jobs:
       - name: Populate Environment Variables
         run: |
           cat > backend.hcl <<'EOF'
-          bucket                      = "${STATE_BUCKET}"
-          key                         = "${STATE_KEY}"
-          region                      = "${SCW_DEFAULT_REGION}"
-          endpoint                    = "https://s3.${SCW_DEFAULT_REGION}.scw.cloud"
-          access_key                  = "${SCW_ACCESS_KEY}"
-          secret_key                  = "${SCW_SECRET_KEY}"
+          bucket                      = "${TF_VAR_state_bucket}"
+          key                         = "${TF_VAR_state_key}"
+          region                      = "${TF_VAR_sc_region}"
+          endpoint                    = "https://s3.${TF_VAR_sc_region}.scw.cloud"
+          access_key                  = "${TF_VAR_access_key}"
+          secret_key                  = "${TF_VAR_secret_key}"
           skip_credentials_validation = true
           force_path_style            = true
           skip_region_validation      = true
