@@ -1,0 +1,40 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+    # Files
+    - id: check-case-conflict
+    - id: check-executables-have-shebangs
+    - id: check-yaml
+    - id: end-of-file-fixer
+      exclude: '\.md$'
+    - id: mixed-line-ending
+      args: [--fix=lf]
+    - id: trailing-whitespace
+      args: [--markdown-linebreak-ext=md]
+
+    # Git
+    - id: check-added-large-files
+    - id: check-merge-conflict
+    - id: check-vcs-permalinks
+    - id: forbid-new-submodules
+    - id: no-commit-to-branch
+
+    # Security
+    - id: detect-aws-credentials
+      args: ['--allow-missing-credentials']
+    - id: detect-private-key
+
+- repo: https://github.com/antonbabenko/pre-commit-terraform
+  rev: v1.103.0
+  hooks:
+    - id: terraform_docs
+      args:
+        - --args=--recursive
+        - --args=--recursive-path=.
+    - id: terraform_fmt
+      args:
+        - --args=-diff
+    - id: terraform_validate
+    - id: terraform_tflint
+    - id: terraform_trivy
