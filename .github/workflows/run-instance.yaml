@@ -55,9 +55,6 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Validate backend-cfg.hcl
-        run: terraform init -backend-config="./backend-cfg.hcl" -check-only
-
       - name: Terraform Init
         run: terraform init -backend-config="./backend-cfg.hcl"
 
