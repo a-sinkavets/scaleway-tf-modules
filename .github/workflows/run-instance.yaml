@@ -28,11 +28,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      - name: Check for missing environment variables
+        run: |
+          for var in TF_VAR_access_key TF_VAR_secret_key TF_VAR_organization_id TF_VAR_project_id TF_VAR_state_bucket TF_VAR_state_key TF_VAR_sc_zone TF_VAR_sc_region; do
+            if [ -z "${!var}" ]; then
+              echo "Error: $var is not set."
+              exit 1
+            fi
+          done
+
       - name: Populate Environment Variables
-        run: envsubst < backend-cfg.hcl.template > backend-cfg.hcl
+        run: |
+          cat > backend-cfg.hcl <<'EOF'
+          bucket                      = "${TF_VAR_state_bucket}"
+          key                         = "${TF_VAR_state_key}"
+          region                      = "${TF_VAR_sc_region}"
+          endpoint                    = "https://s3.${TF_VAR_sc_region}.scw.cloud"
+          access_key                  = "${TF_VAR_access_key}"
+          secret_key                  = "${TF_VAR_secret_key}"
+          skip_credentials_validation = true
+          force_path_style            = true
+          skip_region_validation      = true
+          skip_requesting_account_id  = true
+          EOF
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
+
+      - name: Validate backend-cfg.hcl
+        run: terraform init -backend-config="./backend-cfg.hcl" -check-only
 
       - name: Terraform Init
         run: terraform init -backend-config="./backend-cfg.hcl"
