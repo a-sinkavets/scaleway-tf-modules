@@ -5,8 +5,7 @@ on:
     inputs:
       action:
         description: 'Choose action to perform'
-        required: true
-        default: 'apply'
+        type: choice
         options:
           - apply
           - destroy
@@ -16,28 +15,37 @@ jobs:
     runs-on: ubuntu-latest
     environment: scaleway-modules
     env:
-      SCW_ACCESS_KEY: ${{ secrets.SCW_ACCESS_KEY }}
-      SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
-      SCW_ORGANIZATION_ID: ${{ secrets.SCW_ORGANIZATION_ID }}
-      SCW_DEFAULT_PROJECT_ID: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
-      STATE_BUCKET:   ${{ secrets.STATE_BUCKET }}
-      STATE_KEY:      ${{ secrets.STATE_KEY }}
-      SCW_DEFAULT_ZONE: ${{ secrets.SCW_DEFAULT_ZONE }}
-      SCW_DEFAULT_REGION: ${{ secrets.SCW_DEFAULT_REGION }}
+      TF_VAR_access_key: ${{ secrets.SCW_ACCESS_KEY }}
+      TF_VAR_secret_key: ${{ secrets.SCW_SECRET_KEY }}
+      TF_VAR_organization_id: ${{ secrets.SCW_ORGANIZATION_ID }}
+      TF_VAR_project_id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+      TF_VAR_state_bucket:   ${{ secrets.STATE_BUCKET }}
+      TF_VAR_state_key:      ${{ secrets.STATE_KEY }}
+      TF_VAR_sc_zone: ${{ secrets.SCW_DEFAULT_ZONE }}
+      TF_VAR_sc_region: ${{ secrets.SCW_DEFAULT_REGION }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      - name: Check for missing environment variables
+        run: |
+          for var in TF_VAR_access_key TF_VAR_secret_key TF_VAR_organization_id TF_VAR_project_id TF_VAR_state_bucket TF_VAR_state_key TF_VAR_sc_zone TF_VAR_sc_region; do
+            if [ -z "${!var}" ]; then
+              echo "Error: $var is not set."
+              exit 1
+            fi
+          done
+
       - name: Populate Environment Variables
         run: |
-          cat > backend.hcl <<'EOF'
-          bucket                      = "${STATE_BUCKET}"
-          key                         = "${STATE_KEY}"
-          region                      = "${SCW_DEFAULT_REGION}"
-          endpoint                    = "https://s3.${SCW_DEFAULT_REGION}.scw.cloud"
-          access_key                  = "${SCW_ACCESS_KEY}"
-          secret_key                  = "${SCW_SECRET_KEY}"
+          cat > backend-cfg.hcl <<EOF
+          bucket                      = "${TF_VAR_state_bucket}"
+          key                         = "${TF_VAR_state_key}"
+          region                      = "${TF_VAR_sc_region}"
+          endpoint                    = "https://s3.${TF_VAR_sc_region}.scw.cloud"
+          access_key                  = "${TF_VAR_access_key}"
+          secret_key                  = "${TF_VAR_secret_key}"
           skip_credentials_validation = true
           force_path_style            = true
           skip_region_validation      = true
@@ -48,7 +56,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="./backend-cfg.hcl"
 
       - name: Terraform Apply
         if: ${{ github.event.inputs.action == 'apply' }}
