@@ -29,25 +29,13 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Populate Environment Variables
-        run: |
-          cat << EOF > backend.hcl
-          bucket                      = "${TF_VAR_state_bucket}"
-          key                         = "${TF_VAR_state_key}"
-          region                      = "${TF_VAR_sc_region}"
-          endpoint                    = "https://s3.${TF_VAR_sc_region}.scw.cloud"
-          access_key                  = "${TF_VAR_access_key}"
-          secret_key                  = "${TF_VAR_secret_key}"
-          skip_credentials_validation = true
-          force_path_style            = true
-          skip_region_validation      = true
-          skip_requesting_account_id  = true
-          EOF
+        run: envsubst < backend-cfg.hcl.template > backend-cfg.hcl
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="./backend-cfg.hcl"
 
       - name: Terraform Apply
         if: ${{ github.event.inputs.action == 'apply' }}
