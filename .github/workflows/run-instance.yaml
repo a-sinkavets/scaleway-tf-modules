@@ -39,7 +39,7 @@ jobs:
 
       - name: Populate Environment Variables
         run: |
-          cat > backend-cfg.hcl <<'EOF'
+          cat > backend-cfg.hcl <<EOF
           bucket                      = "${TF_VAR_state_bucket}"
           key                         = "${TF_VAR_state_key}"
           region                      = "${TF_VAR_sc_region}"
